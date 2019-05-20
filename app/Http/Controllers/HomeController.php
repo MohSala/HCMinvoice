@@ -33,4 +33,8 @@ class HomeController extends Controller
     {
        return view('users');
     }
+    public function viewInvoices()
+    {
+        return view('invoice');
+    }
 }

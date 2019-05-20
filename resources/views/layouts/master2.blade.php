@@ -49,7 +49,7 @@
         <div class="header3-wrap">
             <div class="header__logo">
                 <a href="#">
-                    <img src="images/icon/logo-white.png" alt="CoolAdmin" />
+                    <img style="width:10em" src="images/icon/logowhite.png" alt="CoolAdmin" />
                 </a>
             </div>
             <div class="header__navbar">
@@ -66,14 +66,14 @@
                             <span class="bot-line"></span>Organizations</a>
                     </li>
                     <li>
-                        <a href="">
+                        <a href="{{route('viewInvoices')}}">
                             <i class="fas fa-list"></i>
-                            <span class="bot-line"></span>Invoices</a>
+                            <span class="bot-line"></span>Invoices & Quotes</a>
                     </li>
                     <li>
                         <a href="">
-                            <i class="fas fa-list"></i>
-                            <span class="bot-line"></span>Quotes</a>
+                            <i class="fas fa-users"></i>
+                            <span class="bot-line"></span>Users</a>
                     </li>
                     <li>
                         <a href="">
@@ -451,9 +451,7 @@
 <div class="page-content--bgf7">
  
 
-
-
-    @yield('content')
+@yield('content')
    
 
 

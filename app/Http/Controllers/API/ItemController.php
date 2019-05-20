@@ -4,19 +4,18 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use \App\User;
-use Illuminate\Support\Facades\Hash;
-
-class UserController extends Controller
+use App\Item;
+class ItemController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return User::latest()->paginate(10);
+        // $invoice = \App\Item::where('id','')->get();
+        // return Item::where('invoice_id',$request->id)->get();
     }
 
     /**
@@ -27,19 +26,25 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-
+    
         $this->validate($request,[
             'name' => 'required|string|max:191',
-            'email' => 'required|email|string|unique:users|max:191',
-            'password' => 'required|string|min:6'
+            'quantity' => 'required|integer',
+            'unitcost' => 'required|decimal',
+            'discount' => 'required|decimal'
         ]);
 
-        return User::create([
+        return Item::create([
             'name' => $request['name'],
-            'email' => $request['email'],
-            'type' => $request['type'],
-            'password' => Hash::make($request['password'])
+            'currency' => $request['currency'],
+            'quantity' => $request['quantity'],
+            'unitcost' => $request['unitcost'],
+            'discount' => $request['discount'],
+            // 'org_id' => $request['org_id'],
+            'invoice_id' => $request['invoice_id'],
+
         ]);
+        // return $request->all();
     }
 
     /**
@@ -50,7 +55,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        return Item::where('invoice_id', $id)->get();
     }
 
     /**
@@ -62,16 +67,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-        $this->validate($request,[
-            'name' => 'required|string|max:191',
-            'email' => 'required|string|email|max:191|unique:users,email,'.$user->id,
-            'password' => 'sometimes|string|min:6'
-        ]);
-
-        
-        $user->update($request->all());
-        return ['message' => 'User Updated Successfully'];
+        //
     }
 
     /**
@@ -82,11 +78,6 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-
-        //Delete User
-        $user->delete();
-
-        return ["message" => "user deleted"];
+        //
     }
 }

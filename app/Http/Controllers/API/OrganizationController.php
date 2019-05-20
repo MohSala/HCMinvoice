@@ -4,10 +4,8 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use \App\User;
-use Illuminate\Support\Facades\Hash;
-
-class UserController extends Controller
+use \App\Organization;
+class OrganizationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +14,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::latest()->paginate(10);
+        return Organization::latest()->paginate(10);
     }
 
     /**
@@ -27,19 +25,21 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-
-        $this->validate($request,[
+        $this->validate($request, [
             'name' => 'required|string|max:191',
-            'email' => 'required|email|string|unique:users|max:191',
-            'password' => 'required|string|min:6'
+            'address' => 'required|string|max:191',
+            'email' => 'required|email|max:191',
+            'managed_by' => 'required|string|max:191'
         ]);
 
-        return User::create([
+        return Organization::create([
             'name' => $request['name'],
+            'address' => $request['address'],
             'email' => $request['email'],
-            'type' => $request['type'],
-            'password' => Hash::make($request['password'])
+            'phone' => $request['phone'],
+            'managed_by' => $request['managed_by']
         ]);
+        // return $request->all();
     }
 
     /**
@@ -62,16 +62,17 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $organization = Organization::findOrFail($id);
         $this->validate($request,[
             'name' => 'required|string|max:191',
-            'email' => 'required|string|email|max:191|unique:users,email,'.$user->id,
+            'email' => 'required|string|email|max:191',
+            'address' => 'required|string|max:191',
             'password' => 'sometimes|string|min:6'
         ]);
 
         
-        $user->update($request->all());
-        return ['message' => 'User Updated Successfully'];
+        $organization->update($request->all());
+        return ['message' => 'Organization Updated Successfully'];
     }
 
     /**
@@ -82,11 +83,11 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $organization = Organization::findOrFail($id);
 
-        //Delete User
-        $user->delete();
+        //Delete organization
+        $organization->delete();
 
-        return ["message" => "user deleted"];
+        return ["message" => "organization deleted"];
     }
 }
