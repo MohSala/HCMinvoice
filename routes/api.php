@@ -29,5 +29,6 @@ Route::apiResources([
     'item' => 'API\ItemController'
 ]);
 
+Route::get('findInvoice', 'API\InvoiceController@search');
 
 

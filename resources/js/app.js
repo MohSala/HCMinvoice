@@ -40,7 +40,7 @@ const options = {
   Vue.use(VueProgressBar, options)
 
 Vue.use(VueRouter);
-
+Vue.component('pagination', require('laravel-vue-pagination'));
 // const router= new VueRouter({
 //     linkActiveClass: "active",
 //     linkExactActiveClass: "active",

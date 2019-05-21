@@ -2,6 +2,7 @@
     <div class="row">
         <div class="col-lg-12">
             <h4 style="margin:30px 0 30px 0">Invoices & Quotes</h4>
+            <input style="color:white; border-radius:10px;float:right" @keyup="searchInvoice()" type="search" v-model="search" class="form-control bg-dark col-md-3" placeholder="Search">
             <div class="table-responsive table--no-card m-b-40">
                 <table class="table table-borderless table-dark">
                     <thead>
@@ -18,7 +19,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="invoice in invoices" :key="invoice.id">
+                        <tr v-for="invoice in invoices.data" :key="invoice.id">
                             <td>{{invoice.id}}</td>
                             <td>{{invoice.name}}</td>
                             <td>{{invoice.organ.name}}</td>
@@ -35,6 +36,10 @@
                         </tr>
                     </tbody>
                 </table>
+                <pagination :data="invoices" @pagination-change-page="getResults">
+                    <span slot="prev-nav">&lt; Previous</span>
+	                <span slot="next-nav">Next &gt;</span>
+                </pagination>
             </div>
         </div>
         
@@ -119,18 +124,18 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="item in items" v-bind:key="item.id">
-                                        <td>{{item.id}}</td>
+                                    <tr v-for="item in invoiceList" v-bind:key="item.id">
+                                        <!-- <td>{{item.id}}</td> -->
                                         <td>{{item.name}}</td>
                                         <td>{{item.quantity}}</td>
                                         <td>{{item.unitcost}}</td>
                                         <td>{{item.discount}}</td>
-                                        <td></td>
+                                        <td>{{getsingleTotal(item) | curr}} </td>
                                         <td>
                                             <!-- <button class="btn btn-outline-info btn-sm" ><i class="fas fa-edit"></i></button> -->
                                         </td>
                                         <td>
-                                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                                            <button @click="deleteItem(item.id)" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
 
                                         </td>
                                     </tr>
@@ -140,21 +145,29 @@
                                         <td></td>
                                         <td></td>
                                         <td>Subtotal:</td>
-                                        <td>5,000,000</td>
+                                        <td style="text-decoration-line:overline underline">{{ getSubTotal().toLocaleString() }}</td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                         <td>VAT(5%):</td>
-                                        <td>5,300,000</td>
+                                        <td style="text-decoration-line:overline underline">{{ getVat().toLocaleString() }}</td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                         <td>Total:</td>
-                                        <td>15,500,000</td>
+                                        <td style="text-decoration-line:overline underline" v-if="invoice.currency == 0">
+                                           N{{ getTotal().toLocaleString()}}
+                                        </td>
+                                        <td style="text-decoration-line:overline underline" v-if="invoice.currency == 1">
+                                            ${{ getTotal().toLocaleString()}}
+                                        </td>
+                                        <td style="text-decoration-line:overline underline" v-if="invoice.currency == 2">
+                                            £{{ getTotal().toLocaleString()}}
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -239,6 +252,8 @@ export default {
         return {
              invoices: {},
              invoice: {},
+             search: '',
+             invoiceList:[{unitcost:0,quantity:0}],
              items: {},
              organization:{},
              organizations:[],
@@ -252,7 +267,21 @@ export default {
             })
         }
     },
+    filters:{
+      curr(val){
+        return val.toLocaleString();
+      }
+    },
     methods: {
+        searchInvoice() {
+            Fire.$emit('searching')
+        },
+        getResults(page = 1) {
+        axios.get('api/invoice?page=' + page)
+            .then(response => {
+                this.invoices = response.data;
+            }); 
+        },
         getItems() {
             axios.get('api/item')
             .then(({data}) => {
@@ -315,7 +344,7 @@ export default {
             axios.get('api/invoice')
             .then(({data}) => {
                 // console.log(data)
-                this.invoices = data.data;
+                this.invoices = data;
             })
             .catch((err) => {
                 console.log(err)
@@ -409,12 +438,54 @@ export default {
             })
             
         },
+        deleteItem(id) {
+            this.form.delete('api/item/'+id)
+            
+            .then(() => {
+                toast.fire({
+                type: 'success',
+                title: 'Item Deleted Successfully'
+                })
+                 Fire.$emit('AfterCreate');
+            })
+            .then(() => {
+                $('#invoiceForm').modal('hide')
+            })
+            
+            .catch((err) => {
+                console.log(err)
+            })
+        },
         show(invoice) {
             this.invoice = invoice;
             axios.get('api/item/'+ invoice.id)
             .then(({data}) => {
-              
+              this.invoiceList = data;
             })
+        },
+        getsingleTotal(v) {
+            //    let total = 0
+            return (+v.unitcost * 1 * v.quantity) - this.getDiscount(v.discount, (+v.unitcost * 1 * v.quantity) );
+        },
+        getVat(){
+            let vat = 5/100 *  this.getSubTotal()
+           return vat
+        },
+        getSubTotal(){
+            let tot = 0;
+            this.invoiceList.forEach((v,k)=>{
+               
+               tot+=this.getsingleTotal(v);
+           
+            });
+            return tot;
+        //   return this.invoiceList.reduce((a,b)=>{ return (+a.unitcost * a.quantity) +  (+b.unitcost * b.quantity) });
+        },
+        getDiscount(percent,amt){
+          return percent/100 * amt;
+        },
+        getTotal(){
+           return this.getSubTotal() + this.getVat();
         },
         showOneOrg(organization) {
             this.organization = organization;
@@ -424,7 +495,19 @@ export default {
     this.loadInvoices();
     this.fetchOrgs();
     this.show(invoice);
-    Fire.$on('AfterCreate', () => {this.loadInvoices()});
+    Fire.$on('AfterCreate', () => {
+        this.loadInvoices(),
+        this.show(invoice)
+        });
+    Fire.$on('searching', () => {
+        let query =  this.search;
+        axios.get('api/findInvoice?q=' + query)
+        .then(({data}) => {
+            this.invoices = data.data
+        })
+        .catch()
+    })
     }
+    
 }
 </script>

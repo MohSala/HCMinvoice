@@ -29,9 +29,9 @@ class ItemController extends Controller
     
         $this->validate($request,[
             'name' => 'required|string|max:191',
-            'quantity' => 'required|integer',
-            'unitcost' => 'required|decimal',
-            'discount' => 'required|decimal'
+            'quantity' => 'required',
+            'unitcost' => 'required',
+            'discount' => 'required'
         ]);
 
         return Item::create([
@@ -78,6 +78,11 @@ class ItemController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $item = Item::findOrFail($id);
+
+        //Delete item
+        $item->delete();
+
+        return ["message" => "item deleted"];
     }
 }

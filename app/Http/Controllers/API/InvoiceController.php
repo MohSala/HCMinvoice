@@ -84,4 +84,17 @@ class InvoiceController extends Controller
 
         return ["message" => "invoice deleted"];
     }
+
+    public function search()
+    {
+        if ($search = \Request::get('q')) {
+            $invoices = Invoice::where(function($query) use ($search) {
+                $query->where('name', 'LIKE', "%$search%");
+            })->paginate(10);
+        }
+        else {
+            $invoices = Invoice::latest()->paginate(10);
+        }
+        return $invoices;
+    }
 }
