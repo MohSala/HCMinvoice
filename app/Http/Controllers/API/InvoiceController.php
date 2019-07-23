@@ -16,7 +16,7 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        return Invoice::latest()->with('organ')->paginate(10);
+        return Invoice::latest()->with('organ')->paginate(5);
     }
 
     /**

@@ -15,7 +15,6 @@
                             <th>Action</th>
                             <th>Add Item</th>
                             <th><button class="btn btn-success btn-sm" @click="clearform"><i class="fa fa-list"></i> </button> </th>
-                            
                         </tr>
                     </thead>
                     <tbody>
@@ -174,7 +173,7 @@
                     </div>
 						<div class="modal-footer">
                             <button type="submit" class="btn btn-success"><i class="fas fa-check"></i>     Submit for Review</button>
-							<button type="submit" class="btn btn-danger"><i class="fas fa-download"></i>      Generate Quote</button>
+							<button @click.prevent="printPDF" type="submit" class="btn btn-danger"><i class="fas fa-download"></i>      Generate Quote</button>
                             <!-- <button  type="submit" class="btn btn-primary">Update</button> -->
 						</div>
 					
@@ -273,6 +272,9 @@ export default {
       }
     },
     methods: {
+        printPDF() {
+            window.print()
+        },
         searchInvoice() {
             Fire.$emit('searching')
         },
@@ -330,7 +332,7 @@ export default {
                 console.log(error)
             })
             this.$Progress.finish();
-
+            this.loadInvoices();
         },
         editform(invoice) {
                 

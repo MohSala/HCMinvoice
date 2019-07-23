@@ -2413,7 +2413,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2443,6 +2442,9 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    printPDF: function printPDF() {
+      window.print();
+    },
     searchInvoice: function searchInvoice() {
       Fire.$emit('searching');
     },
@@ -2496,6 +2498,7 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error);
       });
       this.$Progress.finish();
+      this.loadInvoices();
     },
     editform: function editform(invoice) {
       this.editMode = true;
@@ -62505,7 +62508,27 @@ var render = function() {
                 )
               ]),
               _vm._v(" "),
-              _vm._m(4)
+              _c("div", { staticClass: "modal-footer" }, [
+                _vm._m(4),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-danger",
+                    attrs: { type: "submit" },
+                    on: {
+                      click: function($event) {
+                        $event.preventDefault()
+                        return _vm.printPDF($event)
+                      }
+                    }
+                  },
+                  [
+                    _c("i", { staticClass: "fas fa-download" }),
+                    _vm._v("      Generate Quote")
+                  ]
+                )
+              ])
             ])
           ]
         )
@@ -62864,25 +62887,14 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-footer" }, [
-      _c(
-        "button",
-        { staticClass: "btn btn-success", attrs: { type: "submit" } },
-        [
-          _c("i", { staticClass: "fas fa-check" }),
-          _vm._v("     Submit for Review")
-        ]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        { staticClass: "btn btn-danger", attrs: { type: "submit" } },
-        [
-          _c("i", { staticClass: "fas fa-download" }),
-          _vm._v("      Generate Quote")
-        ]
-      )
-    ])
+    return _c(
+      "button",
+      { staticClass: "btn btn-success", attrs: { type: "submit" } },
+      [
+        _c("i", { staticClass: "fas fa-check" }),
+        _vm._v("     Submit for Review")
+      ]
+    )
   },
   function() {
     var _vm = this
